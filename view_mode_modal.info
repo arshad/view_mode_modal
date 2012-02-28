@@ -2,3 +2,4 @@ name = View Mode Modal
 description = Use entity view modes inside <a href="http://drupal.org/project/ctools">Ctools</a> modal.
 core = 7.x
 dependencies[] = ctools
+dependencies[] = entity
