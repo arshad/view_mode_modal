@@ -30,7 +30,7 @@ function view_mode_modal_menu() {
   $items = array();
   
   $items['modal/%ctools_js/view/%/%node/%'] = array(
-    'title' => t('View Entity'),
+    'title' => 'View Entity',
     'page callback' => 'view_mode_modal_view_entity',
     'page arguments' => array(1, 3, 4),
     'access callback' => TRUE,
@@ -128,8 +128,8 @@ function view_mode_modal_entity_view_alter(&$build, $type) {
 }
 
 function view_mode_modal_build_post_render($element, $build) {
-  if (isset($build['#node']) || isset($build['#user'])) {
-    $entity = ($build['#node']) ? $build['#node'] : $build['#user'];
+  if (isset($build['#node'])) {
+    $entity = $build['#node'];
     $entity_type = $build['#entity_type'];
     $bundle = $build['#bundle'];
     $view_mode = $build['#view_mode'];
@@ -148,7 +148,6 @@ function view_mode_modal_build_post_render($element, $build) {
       ));
       
       $output .= '</div>';
-      
       return $output;
     }
   }
@@ -168,7 +167,6 @@ function view_mode_modal_build_post_render($element, $build) {
 function view_mode_modal_get_entity_view_modes($entity_type) {
   //load entity information
   $entity = entity_get_info($entity_type);
-  
   return $entity['view modes'];
 }
 
