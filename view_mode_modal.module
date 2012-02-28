@@ -12,14 +12,9 @@ function view_mode_modal_init() {
   //add css files
   drupal_add_css(drupal_get_path('module', 'view_mode_modal') . '/view_mode_modal.css');
   
-  //add js files
-  drupal_add_js(drupal_get_path('module', 'view_mode_modal') . '/view_mode_modal.js');
-  
-  // Include the CTools tools that we need.
+  // Include Ctools files
   ctools_include('ajax');
   ctools_include('modal');
-
-  // Add CTools' javascript to the page.
   ctools_modal_add_js();
 }
 
@@ -53,7 +48,7 @@ function view_mode_modal_view_entity($js = NULL, $entity_type, $entity_id, $view
     ctools_include('ajax');
     $commands = array();
     $commands[] = ctools_modal_command_display($title, $output);
-    print ajax_render($commands); // this function exits.
+    print ajax_render($commands);
     exit;
   }
   else {
@@ -122,7 +117,7 @@ function view_mode_modal_field_ui_display_overview_form_submit($form, &$form_sta
 }
 
 /**
- * Implements hook_preprocess().
+ * Implements hook_entity_view_alter().
  */
 function view_mode_modal_entity_view_alter(&$build, $type) {
   $build['#post_render'][] = 'view_mode_modal_build_post_render';
@@ -140,6 +135,9 @@ function view_mode_modal_build_post_render($element, $build) {
     
     if (isset($view_mode_settings['view_mode_modal_target']) && !empty($view_mode_settings['view_mode_modal_target'])) {
       $target_view_mode = $view_mode_settings['view_mode_modal_target'];
+      
+      //we do not wrap the output in an anchor because it is not HTML valid.
+      //use an anchor inside the output and place it over the output with CSS
       $output = '<div class="view-mode-target-wrapper">';
       $output .= $element;
       $output .= l(t('Open'), 'modal/nojs/view/' . $entity_type . '/' . $entity_id . '/' . $target_view_mode, array(
@@ -147,8 +145,8 @@ function view_mode_modal_build_post_render($element, $build) {
           'class' => array('view-mode-target-link', 'ctools-use-modal'),
         ),
       ));
-      
       $output .= '</div>';
+      
       return $output;
     }
   }
