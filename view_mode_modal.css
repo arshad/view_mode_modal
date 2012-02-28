@@ -3,10 +3,9 @@
  * CSS for View Mode Modal module
  */
 .view-mode-target-wrapper {
-  border:1px solid #0071B3;
   cursor:pointer;
   position:relative;
-  padding:10px;
+  background:#F6F6F6;
 }
 
 .view-mode-target-link {

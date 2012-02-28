@@ -46,7 +46,7 @@ function view_mode_modal_view_entity($js = NULL, $entity_type, $entity_id, $view
   }
   
   $entity = entity_load($entity_type, array($entity_id));
-  $title = $entity->title;
+  $title = view_mode_modal_get_entity_title($entity_type, $entity[$entity_id]);
   $output = render(entity_view($entity_type, $entity, $view_mode));
   
   if ($js) {
@@ -129,8 +129,8 @@ function view_mode_modal_entity_view_alter(&$build, $type) {
 }
 
 function view_mode_modal_build_post_render($element, $build) {
-  if (isset($build['#node'])) {
-    $entity = $build['#node'];
+  $entity = view_mode_modal_get_entity_info($build);
+  if ($entity) {
     $entity_type = $build['#entity_type'];
     $bundle = $build['#bundle'];
     $view_mode = $build['#view_mode'];
@@ -154,6 +154,39 @@ function view_mode_modal_build_post_render($element, $build) {
   }
   
   return $element;
+}
+
+/**
+ * Helper function to get required entity
+ *
+ * @param $build
+ *  see view_mode_modal_entity_view_alter
+ */
+function view_mode_modal_get_entity_info($build) {
+  switch ($build['#entity_type']) {
+    case 'node':
+      return $build['#node'];
+    case 'user':
+      return $build['#account'];
+  }
+  
+  return FALSE;
+}
+
+
+/**
+ * Helper function to get title from entity
+ *
+ * @param $entity
+ *  the entity object
+ */
+function view_mode_modal_get_entity_title($entity_type, $entity) {
+  switch ($entity_type) {
+    case 'node':
+      return $entity->title;
+    case 'user':
+      return $entity->name;
+  }
 }
 
 /**
