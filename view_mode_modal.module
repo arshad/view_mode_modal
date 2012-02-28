@@ -98,9 +98,13 @@ function view_mode_modal_form_field_ui_display_overview_form_alter(&$form, &$for
     '#default_value' => isset($bundle_settings['view_modes'][$view_mode]['view_mode_modal_target']) ? $bundle_settings['view_modes'][$view_mode]['view_mode_modal_target'] : '',
   );
   
+  //add a custom submit handler
   $form['#submit'][] = 'view_mode_modal_field_ui_display_overview_form_submit';
 }
 
+/**
+ * Submit handler for field_ui_display_overview_form form
+ */
 function view_mode_modal_field_ui_display_overview_form_submit($form, &$form_state) {
   $form_values = $form_state['values'];
   $entity_type = $form['#entity_type'];
@@ -123,6 +127,9 @@ function view_mode_modal_entity_view_alter(&$build, $type) {
   $build['#post_render'][] = 'view_mode_modal_build_post_render';
 }
 
+/**
+ * Post render callback for entity_view
+ */
 function view_mode_modal_build_post_render($element, $build) {
   $entity = view_mode_modal_get_entity_info($build);
   if ($entity) {
@@ -170,7 +177,6 @@ function view_mode_modal_get_entity_info($build) {
   
   return FALSE;
 }
-
 
 /**
  * Helper function to get title from entity
