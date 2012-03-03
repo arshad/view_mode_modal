@@ -65,6 +65,7 @@ function view_mode_modal_form_field_ui_display_overview_form_alter(&$form, &$for
   $view_mode = $form['#view_mode'];
   $bundle_settings = field_bundle_settings($entity_type, $bundle);
   $view_mode_options = array('' => t('None')) + view_mode_modal_view_mode_options($form['#entity_type']);
+  $view_mode_modal_settings = isset($bundle_settings['view_modes'][$view_mode]['view_mode_modal']) ? $bundle_settings['view_modes'][$view_mode]['view_mode_modal'] : '';
   
   // Add additional settings vertical tab.
   if (!isset($form['additional_settings'])) {
@@ -88,14 +89,22 @@ function view_mode_modal_form_field_ui_display_overview_form_alter(&$form, &$for
     '#collapsed' => FALSE,
     '#parents' => array('additional_settings'),
   );
-  $form['additional_settings']['view_mode_modal']['view_mode_modal_target'] = array(
+  
+  $form['additional_settings']['view_mode_modal']['target_view_mode'] = array(
     '#title' => t('Target view mode'),
     '#description' => t('Link the !current view mode to the view mode selected above.', array(
       '!current' => '<strong>' . $form['#view_mode'] . '</strong>',
     )),
     '#type' => 'select',
     '#options' => $view_mode_options,
-    '#default_value' => isset($bundle_settings['view_modes'][$view_mode]['view_mode_modal_target']) ? $bundle_settings['view_modes'][$view_mode]['view_mode_modal_target'] : '',
+    '#default_value' => isset($view_mode_modal_settings['target_view_mode']) ? $view_mode_modal_settings['target_view_mode'] : '',
+  );
+  
+  $form['additional_settings']['view_mode_modal']['modal_class'] = array(
+    '#title' => t('Modal class'),
+    '#type' => 'textfield',
+    '#description' => t('If you are using a custom modal, you can set the modal class to use here.'),
+    '#default_value' => isset($view_mode_modal_settings['modal_class']) ? $view_mode_modal_settings['modal_class'] : '',
   );
   
   //add a custom submit handler
@@ -110,11 +119,13 @@ function view_mode_modal_field_ui_display_overview_form_submit($form, &$form_sta
   $entity_type = $form['#entity_type'];
   $bundle = $form['#bundle'];
   $view_mode = $form['#view_mode'];
-  $target_view_mode = $form_values['additional_settings']['view_mode_modal_target'];
+  $view_mode_modal_settings = array();
+  $view_mode_modal_settings['target_view_mode'] = $form_values['additional_settings']['target_view_mode'];
+  $view_mode_modal_settings['modal_class'] = $form_values['additional_settings']['modal_class'];
   
   // Get current bundle settings.
   $bundle_settings = field_bundle_settings($entity_type, $bundle);
-  $bundle_settings['view_modes'][$view_mode]['view_mode_modal_target'] = $target_view_mode;
+  $bundle_settings['view_modes'][$view_mode]['view_mode_modal'] = $view_mode_modal_settings;
   
   // Save updated bundle settings.
   field_bundle_settings($entity_type, $bundle, $bundle_settings);
@@ -137,11 +148,12 @@ function view_mode_modal_build_post_render($element, $build) {
     $bundle = $build['#bundle'];
     $view_mode = $build['#view_mode'];
     $bundle_settings = field_bundle_settings($entity_type, $bundle);
-    $view_mode_settings = $bundle_settings['view_modes'][$view_mode];
+    $view_mode_modal_settings = isset($bundle_settings['view_modes'][$view_mode]['view_mode_modal']) ? $bundle_settings['view_modes'][$view_mode]['view_mode_modal'] : '';
     $entity_id = entity_id($entity_type, $entity);
     
-    if (isset($view_mode_settings['view_mode_modal_target']) && !empty($view_mode_settings['view_mode_modal_target'])) {
-      $target_view_mode = $view_mode_settings['view_mode_modal_target'];
+    if (isset($view_mode_modal_settings['target_view_mode']) && !empty($view_mode_modal_settings['target_view_mode'])) {
+      $target_view_mode = $view_mode_modal_settings['target_view_mode'];
+      $modal_class = isset($view_mode_modal_settings['modal_class']) ? $view_mode_modal_settings['modal_class'] : '';
       
       //we do not wrap the output in an anchor because it is not HTML valid.
       //use an anchor inside the output and place it over the output with CSS
@@ -149,7 +161,7 @@ function view_mode_modal_build_post_render($element, $build) {
       $output .= $element;
       $output .= l(t('Open'), 'modal/nojs/view/' . $entity_type . '/' . $entity_id . '/' . $target_view_mode, array(
         'attributes' => array(
-          'class' => array('view-mode-target-link', 'ctools-use-modal'),
+          'class' => array('view-mode-target-link', 'ctools-use-modal', $modal_class),
         ),
       ));
       $output .= '</div>';
