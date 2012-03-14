@@ -159,7 +159,7 @@ function view_mode_modal_build_post_render($element, $build) {
       //use an anchor inside the output and place it over the output with CSS
       $output = '<div class="view-mode-target-wrapper">';
       $output .= $element;
-      $output .= l(t('Open'), 'modal/nojs/view/' . $entity_type . '/' . $entity_id . '/' . $target_view_mode, array(
+      $output .= l(t('Read more'), 'modal/nojs/view/' . $entity_type . '/' . $entity_id . '/' . $target_view_mode, array(
         'attributes' => array(
           'class' => array('view-mode-target-link', 'ctools-use-modal', $modal_class),
         ),
