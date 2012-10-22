@@ -154,10 +154,10 @@ function view_mode_modal_build_post_render($element, $build) {
     if (isset($view_mode_modal_settings['target_view_mode']) && !empty($view_mode_modal_settings['target_view_mode'])) {
       $target_view_mode = $view_mode_modal_settings['target_view_mode'];
       $modal_class = isset($view_mode_modal_settings['modal_class']) ? $view_mode_modal_settings['modal_class'] : '';
-      
+
       //we do not wrap the output in an anchor because it is not HTML valid.
       //use an anchor inside the output and place it over the output with CSS
-      $output = '<div class="view-mode-target-wrapper">';
+      $output = '<div class="view-mode-target-wrapper entity-type-' . $entity_type . ' bundle-type-' . $entity->type . '">';
       $output .= $element;
       $output .= l(t('Read more'), 'modal/nojs/view/' . $entity_type . '/' . $entity_id . '/' . $target_view_mode, array(
         'attributes' => array(
