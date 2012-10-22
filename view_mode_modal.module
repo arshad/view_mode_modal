@@ -36,7 +36,7 @@ function view_mode_modal_init() {
   drupal_add_js($modal_style, 'setting');
 
   //add css files
-  drupal_add_css(drupal_get_path('module', 'view_mode_modal') . '/view_mode_modal.css');
+  drupal_add_css(drupal_get_path('module', 'view_mode_modal') . '/css/view_mode_modal.css');
   
   //load js files
   drupal_add_js(drupal_get_path('module', 'view_mode_modal') . '/js/view_mode_modal.js');
