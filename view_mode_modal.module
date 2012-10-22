@@ -104,7 +104,6 @@ function view_mode_modal_form_field_ui_display_overview_form_alter(&$form, &$for
     $form['#attached']['js'][] = 'misc/collapse.js';
   }
   
-  // Add extra guidelines for webmaster.
   $form['additional_settings']['view_mode_modal'] = array(
     '#type' => 'fieldset',
     '#title' => t('Modal'),
@@ -177,7 +176,7 @@ function view_mode_modal_build_post_render($element, $build) {
     
     if (isset($view_mode_modal_settings['target_view_mode']) && !empty($view_mode_modal_settings['target_view_mode'])) {
       $target_view_mode = $view_mode_modal_settings['target_view_mode'];
-      $modal_class = isset($view_mode_modal_settings['modal_class']) ? $view_mode_modal_settings['modal_class'] : '';
+      $modal_class = (isset($view_mode_modal_settings['modal_class']) && $view_mode_modal_settings['modal_class'] != '') ? $view_mode_modal_settings['modal_class'] : 'ctools-modal-view-mode-modal';
 
       //we do not wrap the output in an anchor because it is not HTML valid.
       //use an anchor inside the output and place it over the output with CSS
