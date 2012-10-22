@@ -20,3 +20,19 @@
   font-size:0;
   line-height:0;
 }
+
+.ctools-modal-content.view-mode-modal {
+  border: none;
+  box-shadow: 0 0 5px #888;
+  -moz-box-shadow: 0 0 5px #888;
+  -webkit-box-shadow: 0 0 5px #888;
+  overflow: hidden;
+}
+
+.ctools-modal-content.view-mode-modal .modal-header {
+  padding: 10px 15px;
+}
+
+.ctools-modal-content.view-mode-modal .modal-header h3 {
+  margin: 0;
+}
