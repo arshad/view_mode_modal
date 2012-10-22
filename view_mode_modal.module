@@ -9,13 +9,37 @@
  * Implements hook_init().
  */
 function view_mode_modal_init() {
-  //add css files
-  drupal_add_css(drupal_get_path('module', 'view_mode_modal') . '/view_mode_modal.css');
-  
   // Include Ctools files
   ctools_include('ajax');
   ctools_include('modal');
   ctools_modal_add_js();
+
+  $loading_image_path = drupal_get_path('module', 'view_mode_modal') . '/images/icon-loading.gif';
+  
+  $modal_style = array(
+    'view-mode-modal' => array(
+      'modalSize' => array(
+        'type' => 'fixed',
+        'width' => 700,
+        'height' => 500,
+      ),
+      'modalOptions' => array(
+        'opacity' => .8,
+      ),
+      'animation' => 'fadeIn',
+      'modalTheme' => 'ViewModeModal',
+      'throbber' => theme('image', array('path' => $loading_image_path, 'alt' => t('Loading...'), 'title' => t('Loading'))),
+      'htmlClass' => 'view-mode-modal',
+    ),
+  );
+
+  drupal_add_js($modal_style, 'setting');
+
+  //add css files
+  drupal_add_css(drupal_get_path('module', 'view_mode_modal') . '/view_mode_modal.css');
+  
+  //load js files
+  drupal_add_js(drupal_get_path('module', 'view_mode_modal') . '/js/view_mode_modal.js');
 }
 
 /**
