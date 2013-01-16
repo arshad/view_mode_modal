@@ -58,6 +58,9 @@ function view_mode_modal_menu() {
   return $items;
 }
 
+/**
+ * Callback function
+ */
 function view_mode_modal_view_entity($js = NULL, $entity_type, $entity_id, $view_mode) {
   if (!$js) {
     //TODO handle fallbck is $js is not set
@@ -178,9 +181,9 @@ function view_mode_modal_build_post_render($element, $build) {
       $target_view_mode = $view_mode_modal_settings['target_view_mode'];
       $modal_class = (isset($view_mode_modal_settings['modal_class']) && $view_mode_modal_settings['modal_class'] != '') ? $view_mode_modal_settings['modal_class'] : 'ctools-modal-view-mode-modal';
 
-      //we do not wrap the output in an anchor because it is not HTML valid.
-      //use an anchor inside the output and place it over the output with CSS
-      $output = '<div class="view-mode-target-wrapper entity-type-' . $entity_type . ' bundle-type-' . $entity->type . '">';
+      // we do not wrap the output in an anchor because it is not HTML valid.
+      // use an anchor inside the output and place it over the output with CSS
+      $output = '<div class="view-mode-target-wrapper clearfix entity-type-' . drupal_html_class($entity_type) . ' bundle-type-' . drupal_html_class($bundle) . '">';
       $output .= $element;
       $output .= l(t('Read more'), 'modal/nojs/view/' . $entity_type . '/' . $entity_id . '/' . $target_view_mode, array(
         'attributes' => array(
@@ -203,6 +206,14 @@ function view_mode_modal_build_post_render($element, $build) {
  *  see view_mode_modal_entity_view_alter
  */
 function view_mode_modal_get_entity_info($build) {
+
+  // entity support
+  if (isset($build['#entity']) && isset($build['#entity_type'])) {
+    return $build['#entity'];
+  }
+
+  // legacy - for node and user
+  // TODO - check if this code is still needed
   switch ($build['#entity_type']) {
     case 'node':
       return $build['#node'];
