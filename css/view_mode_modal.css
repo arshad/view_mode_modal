@@ -31,8 +31,13 @@
 
 .ctools-modal-content.view-mode-modal .modal-header {
   padding: 10px 15px;
+  min-height: 30px;
 }
 
 .ctools-modal-content.view-mode-modal .modal-header h3 {
   margin: 0;
+}
+
+.ctools-modal-content.view-mode-modal .modal-header a.close {
+  font-size: 20px;
 }

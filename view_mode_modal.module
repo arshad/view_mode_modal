@@ -63,12 +63,12 @@ function view_mode_modal_menu() {
  */
 function view_mode_modal_view_entity($js = NULL, $entity_type, $entity_id, $view_mode) {
   if (!$js) {
-    //TODO handle fallbck is $js is not set
+    //TODO handle fallback is $js is not set
     return drupal_access_denied();
   }
   
   $entity = entity_load($entity_type, array($entity_id));
-  $title = view_mode_modal_get_entity_title($entity_type, $entity[$entity_id]);
+  $title = view_mode_modal_get_entity_title($entity_type, $entity[$entity_id], $view_mode);
   $output = render(entity_view($entity_type, $entity, $view_mode));
   
   if ($js) {
@@ -93,7 +93,15 @@ function view_mode_modal_form_field_ui_display_overview_form_alter(&$form, &$for
   $bundle_settings = field_bundle_settings($entity_type, $bundle);
   $view_mode_options = array('' => t('None')) + view_mode_modal_view_mode_options($form['#entity_type']);
   $view_mode_modal_settings = isset($bundle_settings['view_modes'][$view_mode]['view_mode_modal']) ? $bundle_settings['view_modes'][$view_mode]['view_mode_modal'] : '';
-  
+
+  $fields = $form['fields'];
+  $fields_options = view_mode_modal_entity_fields_options($form['fields']);
+
+  // for node entities, add the title field
+  if ($entity_type == 'node') {
+    $fields_options = array('title' => t('Title')) + $fields_options;
+  }
+
   // Add additional settings vertical tab.
   if (!isset($form['additional_settings'])) {
     $form['additional_settings'] = array(
@@ -125,6 +133,16 @@ function view_mode_modal_form_field_ui_display_overview_form_alter(&$form, &$for
     '#options' => $view_mode_options,
     '#default_value' => isset($view_mode_modal_settings['target_view_mode']) ? $view_mode_modal_settings['target_view_mode'] : '',
   );
+
+  $form['additional_settings']['view_mode_modal']['title_field'] = array(
+    '#title' => t('Title field'),
+    '#description' => t('Field to use for the modal title when the !current view mode is shown in a modal.', array(
+      '!current' => '<strong>' . $form['#view_mode'] . '</strong>',
+    )),
+    '#type' => 'select',
+    '#options' => $fields_options,
+    '#default_value' => isset($view_mode_modal_settings['title_field']) ? $view_mode_modal_settings['title_field'] : '',
+  );
   
   $form['additional_settings']['view_mode_modal']['modal_class'] = array(
     '#title' => t('Modal class'),
@@ -148,6 +166,7 @@ function view_mode_modal_field_ui_display_overview_form_submit($form, &$form_sta
   $view_mode_modal_settings = array();
   $view_mode_modal_settings['target_view_mode'] = $form_values['additional_settings']['target_view_mode'];
   $view_mode_modal_settings['modal_class'] = $form_values['additional_settings']['modal_class'];
+  $view_mode_modal_settings['title_field'] = $form_values['additional_settings']['title_field'];
   
   // Get current bundle settings.
   $bundle_settings = field_bundle_settings($entity_type, $bundle);
@@ -200,13 +219,35 @@ function view_mode_modal_build_post_render($element, $build) {
 }
 
 /**
+ * Return settings for an entity
+ *
+ * @param $entity
+ *  the entity object
+ *
+ * @param $entity_type
+ *  the type of entity
+ */
+function view_mode_modal_get_settings($entity, $entity_type, $view_mode = FALSE) {
+  $bundle = view_mode_modal_entity_get_bundle($entity, $entity_type);
+
+  if ($bundle) {
+    $settings = field_bundle_settings($entity_type, $bundle);
+    if ($view_mode) {
+      return $settings['view_modes'][$view_mode];
+    }
+    return $settings;
+  }
+
+  return FALSE;
+}
+
+/**
  * Helper function to get required entity
  *
  * @param $build
  *  see view_mode_modal_entity_view_alter
  */
 function view_mode_modal_get_entity_info($build) {
-
   // entity support
   if (isset($build['#entity']) && isset($build['#entity_type'])) {
     return $build['#entity'];
@@ -230,7 +271,21 @@ function view_mode_modal_get_entity_info($build) {
  * @param $entity
  *  the entity object
  */
-function view_mode_modal_get_entity_title($entity_type, $entity) {
+function view_mode_modal_get_entity_title($entity_type, $entity, $view_mode) {
+  $settings = view_mode_modal_get_settings($entity, $entity_type, $view_mode);
+
+  // get title field
+  $title_field = isset($settings['view_mode_modal']['title_field']) ? $settings['view_mode_modal']['title_field'] : '';
+  if (!empty($title_field)) {
+    // return title
+    if ($title_field == 'title') {
+      return $entity->title;
+    }
+
+    // return the field value
+    return $entity->{$title_field}[LANGUAGE_NONE][0]['value'];
+  }
+
   switch ($entity_type) {
     case 'node':
       return $entity->title;
@@ -274,3 +329,34 @@ function view_mode_modal_view_mode_options($entity_type) {
   
   return $view_modes_options;
 }
+
+/**
+ * Helper function to build an #options ready list of fields for entity
+ * 
+ * @param $fields
+ */
+function view_mode_modal_entity_fields_options($fields) {
+  $options = array();
+  foreach (element_children($fields) as $machine_name) {
+    $options[$machine_name] = $fields[$machine_name]['human_name']['#markup'];
+  }
+  return $options;
+}
+
+/**
+ * Helper function to get entity bundle
+ *
+ * @param $entity
+ *  the entity object
+ *
+ * @param $entity_type
+ *  the type of entity
+ */
+function view_mode_modal_entity_get_bundle($entity, $entity_type) {
+  $info = entity_get_info($entity_type);
+  if (empty($info['entity keys']['bundle'])) {
+    return $entity_type;
+  } else {
+    return $entity->{$info['entity keys']['bundle']};
+  }
+}       
