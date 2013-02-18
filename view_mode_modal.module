@@ -136,7 +136,7 @@ function view_mode_modal_form_field_ui_display_overview_form_alter(&$form, &$for
 
   $form['additional_settings']['view_mode_modal']['title_field'] = array(
     '#title' => t('Title field'),
-    '#description' => t('Field to use for the modal title when the !current view mode is shown in a modal.', array(
+    '#description' => t('When !current view mode is shown in a modal, use the field selected here as the modal title.', array(
       '!current' => '<strong>' . $form['#view_mode'] . '</strong>',
     )),
     '#type' => 'select',
