@@ -1,4 +1,6 @@
-view_mode_modal
+View Mode Modal
 ===============
 
 The View Mode Modal module let's you use entity view modes inside CTools modal.
+
+You can link one view mode to another view mode, which opens in a modal.
